@@ -1,4 +1,5 @@
 use std::env;
+use chrono::prelude::*;
 
 fn main() {
     // 引数を受け取る
@@ -16,6 +17,21 @@ fn main() {
 
 struct ClockOutStatus {
     laundry: String,
+    stress: Stress,
+    time: DateTime<Local>,
+    hunger: Hunger,
+}
+
+#[derive(Debug)]
+enum Stress {
+    High,
+    Low,
+}
+
+#[derive(Debug)]
+enum Hunger {
+    Very,
+    ALittle,
 }
 
 impl ClockOutStatus {
@@ -25,14 +41,46 @@ impl ClockOutStatus {
             Some(some_string) => some_string.clone(),
             None => panic!("Failed to load first args"),
         };
+
+        let stress_string = args.get(2);
+        let stress_string = match stress_string {
+            Some(some_string) => some_string,
+            None => panic!("Failed to load second args"),
+        };
+        
+        let stress = match &stress_string[..] {
+            "high" => Stress::High,
+            _ => Stress::Low,
+        };
+
+        let hunger = args.get(3);
+        let hunger = match hunger {
+            Some(some_string) => some_string,
+            None => panic!("Failed to load args"),
+        };
+
+        let hunger = match &hunger[..] {
+            "very" => Hunger::Very,
+            _ => Hunger::ALittle,
+        };
+
         ClockOutStatus {
-            laundry
+            laundry,
+            stress,
+            time: Local::now(),
+            hunger,
         }
     }
 }
 
 fn calc_actions(status: &ClockOutStatus) -> Vec<String> {
     let mut actions = Vec::<String>::new();
+
+    println!("{:?}", status.laundry);
+    println!("{:?}", status.stress);
+    println!("{:?}", status.time);
+    println!("{:?}", status.hunger);
+
     actions.push(String::from("wash clothes"));
     actions
 }
