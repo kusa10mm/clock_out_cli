@@ -9,7 +9,7 @@ fn main() {
     let clock_out_status = ClockOutStatus::new(&args);
 
     // 構造体を渡して結果を計算
-    let actions = calc_actions(&clock_out_status);
+    let actions = calc_actions(clock_out_status);
 
     // 結果を画面出力
     println!("{}", actions[0]);
@@ -34,6 +34,12 @@ enum Hunger {
     ALittle,
 }
 
+enum Dinner {
+    Convinience,
+    NabeSet,
+    Rice,
+}
+
 impl ClockOutStatus {
     fn new(args: &Vec<String>) -> ClockOutStatus {
         let laundry = args.get(1);
@@ -46,8 +52,7 @@ impl ClockOutStatus {
         let stress_string = match stress_string {
             Some(some_string) => some_string,
             None => panic!("Failed to load second args"),
-        };
-        
+        };        
         let stress = match &stress_string[..] {
             "high" => Stress::High,
             _ => Stress::Low,
@@ -58,7 +63,6 @@ impl ClockOutStatus {
             Some(some_string) => some_string,
             None => panic!("Failed to load args"),
         };
-
         let hunger = match &hunger[..] {
             "very" => Hunger::Very,
             _ => Hunger::ALittle,
@@ -73,7 +77,7 @@ impl ClockOutStatus {
     }
 }
 
-fn calc_actions(status: &ClockOutStatus) -> Vec<String> {
+fn calc_actions(status: ClockOutStatus) -> Vec<String> {
     let mut actions = Vec::<String>::new();
 
     println!("{:?}", status.laundry);
@@ -81,6 +85,12 @@ fn calc_actions(status: &ClockOutStatus) -> Vec<String> {
     println!("{:?}", status.time);
     println!("{:?}", status.hunger);
 
+    let dinner = decide_dinner(status.stress, status.time);
+
     actions.push(String::from("wash clothes"));
     actions
+}
+
+fn decide_dinner(stress: Stress, time: DateTime<Local>) -> Dinner {
+    Dinner::NabeSet
 }
