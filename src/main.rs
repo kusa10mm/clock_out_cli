@@ -22,7 +22,7 @@ struct ClockOutStatus {
     hunger: Hunger,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum Stress {
     High,
     Low,
@@ -34,6 +34,7 @@ enum Hunger {
     ALittle,
 }
 
+#[derive(Debug)]
 enum Dinner {
     Convinience,
     NabeSet,
@@ -85,12 +86,20 @@ fn calc_actions(status: ClockOutStatus) -> Vec<String> {
     println!("{:?}", status.time);
     println!("{:?}", status.hunger);
 
-    let dinner = decide_dinner(status.stress, status.time);
+    let dinner_options = decide_dinner(status.stress, status.time);
 
     actions.push(String::from("wash clothes"));
     actions
 }
 
 fn decide_dinner(stress: Stress, time: DateTime<Local>) -> Dinner {
-    Dinner::NabeSet
+    println!("{}", time.hour());
+    let dinner = if stress == Stress::High && time.hour() < 21 {
+        Dinner::NabeSet
+    } else {
+        Dinner::Rice
+    };
+    println!("{:?}", dinner);
+    dinner
 }
+
