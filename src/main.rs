@@ -16,7 +16,7 @@ fn main() {
 }
 
 struct ClockOutStatus {
-    laundry: String,
+    laundry_amount: f32,
     stress: Stress,
     time: DateTime<Local>,
     hunger: Hunger,
@@ -43,9 +43,9 @@ enum Dinner {
 
 impl ClockOutStatus {
     fn new(args: &Vec<String>) -> ClockOutStatus {
-        let laundry = args.get(1);
-        let laundry: String = match laundry {
-            Some(some_string) => some_string.clone(),
+        let laundry_amount_string = args.get(1);
+        let laundry_amount: f32 = match laundry_amount_string {
+            Some(string) => string.parse().unwrap(),
             None => panic!("Failed to load first args"),
         };
 
@@ -70,7 +70,7 @@ impl ClockOutStatus {
         };
 
         ClockOutStatus {
-            laundry,
+            laundry_amount,
             stress,
             time: Local::now(),
             hunger,
@@ -79,25 +79,35 @@ impl ClockOutStatus {
 }
 
 fn calc_actions(status: ClockOutStatus) -> Vec<String> {
-    let mut actions = Vec::<String>::new();
-
-    println!("{:?}", status.laundry);
-    println!("{:?}", status.stress);
-    println!("{:?}", status.time);
-    println!("{:?}", status.hunger);
-
-    let dinner_options = decide_dinner(status.stress, status.time);
-
-    actions.push(String::from("wash clothes"));
+    let dinner_options = calc_dinner(status.stress, status.time);
+    let do_laundry = calc_do_laundry(status.laundry_amount);
+    let actions = calc_order_of_actions(dinner_options, do_laundry, status.hunger);
     actions
 }
 
-fn decide_dinner(stress: Stress, time: DateTime<Local>) -> Dinner {
-    println!("{}", time.hour());
-    let dinner = if stress == Stress::High && time.hour() < 21 {
-        Dinner::NabeSet
+fn calc_order_of_actions(dinner_options: Dinner, do_laundry: bool, hunger: Hunger) -> Vec<String> {
+    Vec::new()
+}
+
+fn calc_do_laundry(laundry_amount: f32) -> bool {
+    if laundry_amount < 1.5 {
+        true
     } else {
-        Dinner::Rice
+        false
+    }
+}
+
+fn calc_dinner(stress: Stress, time: DateTime<Local>) -> Dinner {
+    println!("{}", time.hour());
+    let dinner = match stress {
+        Stress::High => match time.hour() {
+            0..=19 => Dinner::Rice,
+            _ => Dinner::NabeSet,
+        },
+        Stress::Low => match time.hour() {
+            0..=19 => Dinner::Rice,
+            _ => Dinner::Convinience
+        }
     };
     println!("{:?}", dinner);
     dinner
