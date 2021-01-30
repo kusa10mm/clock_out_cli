@@ -12,7 +12,7 @@ fn main() {
     let actions = calc_actions(clock_out_status);
 
     // 結果を画面出力
-    println!("{}", actions[0]);
+    println!("Actions:\n{}\n{}\n{}", actions[0], actions[1], actions[2]);
 }
 
 struct ClockOutStatus {
@@ -28,7 +28,7 @@ enum Stress {
     Low,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum Hunger {
     Very,
     ALittle,
@@ -86,19 +86,29 @@ fn calc_actions(status: ClockOutStatus) -> Vec<String> {
 }
 
 fn calc_order_of_actions(dinner_options: Dinner, do_laundry: bool, hunger: Hunger) -> Vec<String> {
-    Vec::new()
+    let mut actions = Vec::<String>::new();
+    if do_laundry {
+        actions.push(String::from("Do Laundry"));
+    };
+    if hunger == Hunger::ALittle {
+        actions.push(String::from("Training"));
+        actions.push(String::from("Dinner"));
+    } else {
+        actions.push(String::from("Dinner"));
+        actions.push(String::from("Training"));
+    }
+    actions
 }
 
 fn calc_do_laundry(laundry_amount: f32) -> bool {
     if laundry_amount < 1.5 {
-        true
-    } else {
         false
+    } else {
+        true
     }
 }
 
 fn calc_dinner(stress: Stress, time: DateTime<Local>) -> Dinner {
-    println!("{}", time.hour());
     let dinner = match stress {
         Stress::High => match time.hour() {
             0..=19 => Dinner::Rice,
@@ -109,7 +119,7 @@ fn calc_dinner(stress: Stress, time: DateTime<Local>) -> Dinner {
             _ => Dinner::Convinience
         }
     };
-    println!("{:?}", dinner);
+    println!("Dinner Options: {:?}", dinner);
     dinner
 }
 
