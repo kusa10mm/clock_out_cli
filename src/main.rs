@@ -1,5 +1,10 @@
+mod clock_out_status;
+mod status_enum;
+
 use std::env;
 use chrono::prelude::*;
+use status_enum::*;
+use clock_out_status::*;
 
 fn main() {
     // 引数を受け取る
@@ -15,68 +20,7 @@ fn main() {
     println!("Actions:\n{}\n{}\n{}", actions[0], actions[1], actions[2]);
 }
 
-struct ClockOutStatus {
-    laundry_amount: f32,
-    stress: Stress,
-    time: DateTime<Local>,
-    hunger: Hunger,
-}
 
-#[derive(Debug, PartialEq)]
-enum Stress {
-    High,
-    Low,
-}
-
-#[derive(Debug, PartialEq)]
-enum Hunger {
-    Very,
-    ALittle,
-}
-
-#[derive(Debug)]
-enum Dinner {
-    Convinience,
-    NabeSet,
-    Rice,
-}
-
-impl ClockOutStatus {
-    fn new(args: &Vec<String>) -> ClockOutStatus {
-        let laundry_amount_string = args.get(1);
-        let laundry_amount: f32 = match laundry_amount_string {
-            Some(string) => string.parse().unwrap(),
-            None => panic!("Failed to load first args"),
-        };
-
-        let stress_string = args.get(2);
-        let stress_string = match stress_string {
-            Some(some_string) => some_string,
-            None => panic!("Failed to load second args"),
-        };        
-        let stress = match &stress_string[..] {
-            "high" => Stress::High,
-            _ => Stress::Low,
-        };
-
-        let hunger = args.get(3);
-        let hunger = match hunger {
-            Some(some_string) => some_string,
-            None => panic!("Failed to load args"),
-        };
-        let hunger = match &hunger[..] {
-            "very" => Hunger::Very,
-            _ => Hunger::ALittle,
-        };
-
-        ClockOutStatus {
-            laundry_amount,
-            stress,
-            time: Local::now(),
-            hunger,
-        }
-    }
-}
 
 fn calc_actions(status: ClockOutStatus) -> Vec<String> {
     let dinner_options = calc_dinner(status.stress, status.time);
