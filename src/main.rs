@@ -17,7 +17,9 @@ fn main() {
     let actions = calc_actions(clock_out_status);
 
     // 結果を画面出力
-    println!("Actions:\n{}\n{}\n{}", actions[0], actions[1], actions[2]);
+    for (i, action) in actions.iter().enumerate() {
+        println!("{}: {}", i + 1, action);
+    };
 }
 
 
